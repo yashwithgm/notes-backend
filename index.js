@@ -1,32 +1,6 @@
-// const http = require('http');
+const mongoose = require('mongoose');
 
-let notes = [
-    {
-        id: 1,
-        content: "HTML is easy",
-        important: true
-    },
-    {
-        id: 2,
-        content: "Browser can execute only JavaScript",
-        important: false
-    },
-    {
-        id: 3,
-        content: "GET and POST are the most important methods of HTTP protocol",
-        important: true
-    }
-];
-
-// const app = http.createServer((request, response) => {
-//     response.writeHead(200, { 'Content-Type': "application/json" });
-//     response.end(JSON.stringify(notes));
-// });
-
-// const PORT = 3001;
-// app.listen(PORT);
-// console.log(`Server running on port ${PORT}`);
-
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const app = express();
@@ -34,6 +8,9 @@ const app = express();
 app.use(express.static('build'));
 app.use(cors());
 app.use(express.json());
+
+
+const Note = require('./models/note');
 
 app.get('/api/notes/:id', (request, response) => {
     const id = Number(request.params.id);
@@ -46,7 +23,9 @@ app.get('/api/notes/:id', (request, response) => {
 });
 
 app.get('/api/notes', (request, response) => {
-    response.json(notes);
+    Note.find({}).then(notes => {
+        response.json(notes);
+    })
 })
 
 function generateId() {
@@ -82,7 +61,7 @@ app.delete('/api/notes/:id', (request, response) => {
     response.status(204).end();
 });
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT;
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 })
