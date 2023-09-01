@@ -12,9 +12,16 @@ app.use(express.json());
 
 const Note = require('./models/note');
 
-app.get('/api/notes/:id', (request, response) => {
+app.get('/api/notes/:id', (request, response, next) => {
     Note.findById(request.params.id)
-        .then(note => response.json(note));
+        .then(note => {
+            if (note) {
+                response.json(note);
+            } else {
+                response.status(404).end();
+            }
+        })
+        .catch(error => next(error));
 });
 
 app.get('/api/notes', (request, response) => {
@@ -55,6 +62,28 @@ app.delete('/api/notes/:id', (request, response) => {
     notes = notes.filter(note => note.id !== id);
     response.status(204).end();
 });
+
+const unknownEndpoint = (request, response) => {
+    response.status(404).send({
+        error: 'unknown endpoint'
+    });
+}
+
+app.use(unknownEndpoint);
+
+const errorHandler = (error, request, response, next) => {
+    console.log(error.message);
+
+    if (error.name === 'CastError') {
+        return response.status(400).send({
+            error: 'malformed id'
+        });
+    }
+
+    next(error);
+}
+
+app.use(errorHandler);
 
 const PORT = process.env.PORT;
 app.listen(PORT, () => {
