@@ -30,14 +30,6 @@ app.get('/api/notes', (request, response) => {
     })
 })
 
-function generateId() {
-    const maxId = notes.length > 0
-        ? Math.max(...notes.map(note => note.id))
-        : 0;
-
-    return maxId + 1;
-}
-
 app.post('/api/notes', (request, response) => {
     const body = request.body;
 
