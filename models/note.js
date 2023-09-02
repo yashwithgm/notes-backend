@@ -12,10 +12,13 @@ mongoose.connect(url)
     });
 
 const noteSchema = mongoose.Schema({
-    content: String,
+    content: {
+        type: String,
+        required: true,
+        minLength: 5
+    },
     important: Boolean
 });
-
 
 noteSchema.set('toJSON', {
     transform: (document, returnObject) => {
